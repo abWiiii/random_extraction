@@ -12,7 +12,7 @@ from PySide2.QtCore import (QCoreApplication, QMetaObject, QObject, QPoint,
                             QRect, QSize, QUrl, Qt, QRegExp, Signal, Slot, QEvent)
 from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QFont,
                            QFontDatabase, QIcon, QLinearGradient, QPalette, QPainter, QPixmap,
-                           QRadialGradient, QRegExpValidator)
+                           QRadialGradient, QRegExpValidator, QIcon)
 from PySide2.QtWidgets import *
 
 from Ui_Dialog import Ui_Dialog
@@ -20,6 +20,9 @@ from Ui_Dialog import Ui_Dialog
 from random import sample
 import xlrd
 import os
+
+import ctypes
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("REx")
 
 
 class Ui_MainWindow(QMainWindow):
@@ -253,7 +256,7 @@ class Ui_MainWindow(QMainWindow):
 
         QMetaObject.connectSlotsByName(MainWindow)
 
-        self.setupUi_()  # setupUI的补充
+        self.setupUi_(MainWindow)  # setupUI的补充
 
     # setupUi
 
@@ -296,7 +299,12 @@ class Ui_MainWindow(QMainWindow):
 
     # --------------------------------------------------------------------
 
-    def setupUi_(self):
+    def setupUi_(self, MainWindow):
+        # set Icon
+        icon = QIcon()
+        icon.addFile("./aa.ico")
+        MainWindow.setWindowIcon(icon)
+
         # Set constant
         self.LABEL_N = {0: self.label_0,
                         1: self.label_1,
@@ -310,15 +318,22 @@ class Ui_MainWindow(QMainWindow):
                         9: self.label_9}
         self.QUESTIONS = [i for i in range(1, 11)]
 
-        self.FILE = "./货运组理论试题.xls"
+        self.FILE = "./bank/货运组理论试题.xls"
         if os.access(self.FILE, os.F_OK) == False:
+            self.FILE = ''
             self.selectFile()
+
+        # set QMessageBox
+        self.message = QMessageBox(text="选择题库")
+        self.message.setWindowTitle(" ")
 
         # Action
         self.Select.clicked.connect(self.selectFile)
         self.Button.clicked.connect(self.cilckButton)
         for i in self.LABEL_N:
             _label = self.LABEL_N[i]
+            _label.ANSWER = ""
+            _label.TIME = 0
             _label.installEventFilter(self)  # 安装事件过滤器
 
         # Filter
@@ -331,11 +346,16 @@ class Ui_MainWindow(QMainWindow):
 
     def selectFile(self):
         # 选择文件
-        self.FILE = QFileDialog.getOpenFileName(
+        FILE = QFileDialog.getOpenFileName(
             caption="打开execl格式题库", filter="Execl files(*.xls;*.xlsx)")
+        if FILE[0] != '':
+            self.FILE = FILE[0]
 
     def cilckButton(self):
         # 抽题号
+        if self.FILE == '':
+            self.message.exec_()
+            return
         MIN = int(self.MinSelect.text())
         MAX = int(self.MaxSelect.text())
         MAX += 1
@@ -369,11 +389,16 @@ class Ui_MainWindow(QMainWindow):
         dialog.setupUi_(question, ANSWER, TIME)
         dialogWindow.exec_()
 
-    def eventFilter(self, obj, event):
-        if event.type() == QEvent.MouseButtonPress:
-            self.callDialog(obj.text(), obj.ANSWER, obj.TIME)
-            return True
-        else:
+    def eventFilter(self, obj, event):  # 事件过滤器
+        try:
+            if obj.TIME == 0:
+                return False
+            if event.type() == QEvent.MouseButtonPress:
+                self.callDialog(obj.text(), obj.ANSWER, obj.TIME)
+                return True
+            else:
+                return False
+        except AttributeError:
             return False
 
 
@@ -385,3 +410,7 @@ if __name__ == "__main__":
     ui.setupUi(win)
     win.show()
     sys.exit(app.exec_())
+
+
+def quitApp():
+    pass

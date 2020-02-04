@@ -21,6 +21,9 @@ class Ui_Dialog(object):
         if Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
         Dialog.resize(878, 528)
+        icon = QIcon()
+        icon.addFile("./aa.ico")
+        Dialog.setWindowIcon(icon)
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
@@ -81,14 +84,29 @@ class Ui_Dialog(object):
             QCoreApplication.translate("Dialog", u"Dialog", None))
     # retranslateUi
 
-    def setupUi_(self, question=None, answer=None, time=None):
+    def setupUi_(self, question, answer, time):
+        self.T = 0
+        self.TIME = time
         self.questionLable.setText(question)
         self.answerLable.setText(answer)
         self.lcd.setDigitCount(3)  # 设置lcd的显示位数
         self.lcd.display(time)
-        self.time = QTimer()
-        self.time.timeout.connect(self.setlcd)
-        self.time.start(1000)
+        self.timer1 = QTimer()
+        self.timer1.timeout.connect(self.setlcd1)
+        self.timer1.start(1000)
+        self.timer2 = QTimer()
+        self.timer2.timeout.connect(self.setlcd2)
 
-    def setlcd(self):
+    def setlcd1(self):
         self.lcd.display(self.lcd.intValue() - 1)
+        if self.T == self.TIME:
+            self.timer1.stop()
+
+            self.lcd.setSegmentStyle(QLCDNumber.Flat)
+            self.lcd.setStyleSheet("color: red;")
+
+            self.timer2.start(1000)
+        self.T += 1
+
+    def setlcd2(self):
+        self.lcd.display(self.lcd.intValue() + 1)
