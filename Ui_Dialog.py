@@ -8,12 +8,10 @@
 # WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import (QCoreApplication, QMetaObject, QObject, QPoint,
-                            QRect, QSize, QUrl, Qt, QTimer)
-from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QFont,
-                           QFontDatabase, QIcon, QLinearGradient, QPalette, QPainter, QPixmap,
-                           QRadialGradient)
-from PySide2.QtWidgets import *
+from PySide2.QtCore import (QCoreApplication, QMetaObject, QSize, QTimer)
+from PySide2.QtGui import QFont, QIcon
+from PySide2.QtWidgets import (
+    QVBoxLayout, QLabel, QHBoxLayout, QLCDNumber, QSizePolicy, QFrame)
 
 
 class Ui_Dialog(object):
@@ -85,8 +83,6 @@ class Ui_Dialog(object):
     # retranslateUi
 
     def setupUi_(self, question, answer, time):
-        self.T = 0
-        self.TIME = time
         self.questionLable.setText(question)
         self.answerLable.setText(answer)
         self.lcd.setDigitCount(3)  # 设置lcd的显示位数
@@ -94,19 +90,18 @@ class Ui_Dialog(object):
         self.timer1 = QTimer()
         self.timer1.timeout.connect(self.setlcd1)
         self.timer1.start(1000)
-        self.timer2 = QTimer()
-        self.timer2.timeout.connect(self.setlcd2)
+        # self.timer2 = QTimer()
+        # self.timer2.timeout.connect(self.setlcd2)
 
     def setlcd1(self):
         self.lcd.display(self.lcd.intValue() - 1)
-        if self.T == self.TIME:
+        if self.lcd.intValue() == 0:
             self.timer1.stop()
 
-            self.lcd.setSegmentStyle(QLCDNumber.Flat)
-            self.lcd.setStyleSheet("color: red;")
+            # self.lcd.setSegmentStyle(QLCDNumber.Flat)
+            # self.lcd.setStyleSheet("color: red;")
 
-            self.timer2.start(1000)
-        self.T += 1
+            # self.timer2.start(1000)
 
     def setlcd2(self):
         self.lcd.display(self.lcd.intValue() + 1)

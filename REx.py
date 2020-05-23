@@ -8,12 +8,11 @@
 # WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import (QCoreApplication, QMetaObject, QObject, QPoint,
-                            QRect, QSize, QUrl, Qt, QRegExp, Signal, Slot, QEvent)
-from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QFont,
-                           QFontDatabase, QIcon, QLinearGradient, QPalette, QPainter, QPixmap,
-                           QRadialGradient, QRegExpValidator, QIcon)
-from PySide2.QtWidgets import *
+from PySide2.QtCore import (
+    QCoreApplication, QMetaObject,  QSize, Qt, QRegExp, QEvent)
+from PySide2.QtGui import (QFont, QRegExpValidator, QIcon)
+from PySide2.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QMessageBox, QFileDialog,
+                               QDialog, QApplication, QLayout, QPushButton, QSpacerItem, QSizePolicy, QLabel, QLineEdit, QFrame)
 
 from Ui_Dialog import Ui_Dialog
 
@@ -257,7 +256,6 @@ class Ui_MainWindow(QMainWindow):
         QMetaObject.connectSlotsByName(MainWindow)
 
         self.setupUi_(MainWindow)  # setupUI的补充
-
     # setupUi
 
     def retranslateUi(self, MainWindow):
@@ -271,8 +269,9 @@ class Ui_MainWindow(QMainWindow):
             QCoreApplication.translate("MainWindow", u"1", None))
         self.label2.setText(QCoreApplication.translate(
             "MainWindow", u"\u2014", None))
+        # 最大题号
         self.MaxSelect.setText(
-            QCoreApplication.translate("MainWindow", u"300", None))
+            QCoreApplication.translate("MainWindow", u"305", None))
         self.Button.setText(QCoreApplication.translate(
             "MainWindow", u"\u62bd\u9898", None))
         self.label_0.setText(QCoreApplication.translate(
@@ -302,7 +301,7 @@ class Ui_MainWindow(QMainWindow):
     def setupUi_(self, MainWindow):
         # set Icon
         icon = QIcon()
-        icon.addFile("./aa.ico")
+        icon.addFile("./icon.ico")
         MainWindow.setWindowIcon(icon)
 
         # Set constant
@@ -319,7 +318,7 @@ class Ui_MainWindow(QMainWindow):
         self.QUESTIONS = [i for i in range(1, 11)]
 
         self.FILE = "./bank/货运组理论试题.xls"
-        if os.access(self.FILE, os.F_OK) == False:
+        if os.access(self.FILE, os.F_OK) is False:
             self.FILE = ''
             self.selectFile()
 
@@ -356,12 +355,13 @@ class Ui_MainWindow(QMainWindow):
         if self.FILE == '':
             self.message.exec_()
             return
-        MIN = int(self.MinSelect.text())
-        MAX = int(self.MaxSelect.text())
+        MIN = int(self.MinSelect.text()) + 2
+        MAX = int(self.MaxSelect.text()) + 2
         MAX += 1
         if MAX - MIN <= 9:
             return
         self.QUESTIONS = sample(range(MIN, MAX, 1), 10)
+        self.QUESTIONS.sort()
         self.readExecl()
 
     def readExecl(self):
@@ -370,6 +370,8 @@ class Ui_MainWindow(QMainWindow):
         sheet = wb.sheet_by_index(0)
         for i in range(0, 10):
             text = sheet.cell(self.QUESTIONS[i]-1, 1).value
+            text = str(
+                int(sheet.cell(self.QUESTIONS[i]-1, 0).value)) + ". " + text
             ANSWER = sheet.cell(self.QUESTIONS[i]-1, 2).value
             TIME = sheet.cell(self.QUESTIONS[i]-1, 5).value
             self.setLabel(i, text, ANSWER, TIME)
@@ -404,13 +406,10 @@ class Ui_MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     import sys
+
     app = QApplication(sys.argv)
     win = QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(win)
     win.show()
     sys.exit(app.exec_())
-
-
-def quitApp():
-    pass
