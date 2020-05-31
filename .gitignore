@@ -1,0 +1,5 @@
+dist
+build
+rex.spec
+.vscode
+__pycache__/

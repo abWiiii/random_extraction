@@ -20,7 +20,7 @@ class Ui_Dialog(object):
             Dialog.setObjectName(u"Dialog")
         Dialog.resize(878, 528)
         icon = QIcon()
-        icon.addFile("./aa.ico")
+        icon.addFile("./icon.ico")
         Dialog.setWindowIcon(icon)
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
